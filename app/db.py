@@ -1,20 +1,23 @@
 from app import app
-from flask_mysqldb import MySQL
 from dotenv import load_dotenv
 import os
+import pymysql
 
-load_dotenv()  # take environment variables from .env.
+load_dotenv()
 
-# Mysql Settings
-app.config['MYSQL_USER'] = os.getenv('MYSQL_USER')
-app.config['MYSQL_PASSWORD'] = os.getenv('MYSQL_PASSWORD')
-app.config['MYSQL_HOST'] = os.getenv('MYSQL_HOST')
-app.config['MYSQL_DB'] = os.getenv('MYSQL_DB')
-app.config['MYSQL_PORT'] = int(os.getenv('MYSQL_PORT', 3306))
-app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
+# Clase que simula exactamente el comportamiento de Flask-MySQLdb usando PyMySQL puro
+class MySQLConnectionManager:
+    def __init__(self, app=None):
+        pass
+    @property
+    def connection(self):
+        return pymysql.connect(
+            host=os.getenv('MYSQL_HOST', 'db'), # Apunta al contenedor de la base de datos
+            user=os.getenv('MYSQL_USER', 'root'),
+            password=os.getenv('MYSQL_PASSWORD', 'tu_password'),
+            database=os.getenv('MYSQL_DB', 'tu_base_de_datos'),
+            cursorclass=pymysql.cursors.DictCursor
+        )
 
-
-
-
-# MySQL Connection
-mysql = MySQL(app)
+# Creamos la instancia 'mysql' para que devuelva la conexión como propiedad
+mysql = MySQLConnectionManager(app)
